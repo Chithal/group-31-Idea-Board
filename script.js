@@ -26,13 +26,18 @@ document.getElementById('add-idea-btn').addEventListener('click', function() {
     const ideaInput = document.getElementById('idea-input');
     const ideaList = document.getElementById('idea-list');
 
+function validateInputs() {
     const name = nameSelect.value;
     const idea = ideaInput.value.trim();
+    addIdeaBtn.disabled = !name || !idea;
+}
 
-    if (!name || !idea) {
-        alert('Please select your name and enter an idea.');
-        return;
-    }
+nameSelect.addEventListener('change', validateInputs);
+ideaInput.addEventListener('input', validateInputs);
+
+addIdeaBtn.addEventListener('click', function() {
+    const name = nameSelect.value;
+    const idea = ideaInput.value.trim();
 
     const listItem = document.createElement('li');
 
@@ -64,7 +69,7 @@ document.getElementById('add-idea-btn').addEventListener('click', function() {
 
     ideaList.appendChild(listItem);
 
-    // Clear inputs after adding
+    // Clear inputs and re-disable button
     ideaInput.value = '';
     nameSelect.selectedIndex = 0;
 
