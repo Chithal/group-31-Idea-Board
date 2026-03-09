@@ -1,5 +1,6 @@
 body {
-    background-color: #f0f0f0;
+    /* subtle gradient for a more professional look */
+    background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -12,9 +13,11 @@ body {
     background: #fff;
     width: 100%;
     max-width: 600px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 header {
@@ -48,6 +51,19 @@ input, select, button {
 }
 
 button {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -65,9 +81,34 @@ button:disabled {
 }
 
 #idea-list {
-    list-style-type: disc;
-    padding-left: 20px;
+    list-style: none;
+    padding: 0;
     margin-top: 20px;
+}
+
+#idea-list li {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#idea-counter {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.idea-text {
+    font-weight: bold;
+    color: #007bff;
+    font-style: italic;
 }
 
 #idea-list li {
@@ -78,3 +119,25 @@ button:disabled {
 #idea-list li em {
     font-style: italic;
 }
+
+/* avatar + name styling */
+#idea-list li .author {
+    display: inline-flex;
+    align-items: center;
+}
+
+.avatar {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin-right: 8px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #888;
+    text-align: center;
+    line-height: 40px;
+}
+
