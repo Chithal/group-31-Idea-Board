@@ -59,6 +59,11 @@ button:hover {
     background-color: #0056b3;
 }
 
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 #idea-list {
     list-style-type: disc;
     padding-left: 20px;
