@@ -8,7 +8,7 @@
     /* define palette variables for easy tweaks */
     :root {
       --primary: #007bff;
-      --primary-dark: #0056c1;
+      --primary-dark: #08356b;
       --background: #f4f6f8;
       --board-bg: #ffffff;
       --input-border: #ccd0d5;
@@ -18,7 +18,7 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #e0f7fa 0%, #c8e6c9 100%);
+      background: linear-gradient(135deg, #e0f7fa 0%, #3a5b87 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -135,6 +135,9 @@
       font-size: 0.97rem;
       line-height: 1.4;
       transition: background 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .ideas li:hover {
@@ -143,6 +146,26 @@
 
     .ideas li:last-child {
       margin-bottom: 0;
+    }
+
+    .ideas li .idea-text {
+      flex: 1;
+    }
+
+    .ideas li .delete-btn {
+      background: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin-left: 10px;
+      transition: background 0.2s;
+    }
+
+    .ideas li .delete-btn:hover {
+      background: #c82333;
     }
   </style>
 </head>
@@ -153,13 +176,7 @@
       <span>Group Idea Board</span>
     </div>
     <div class="controls">
-      <select id="memberSelect">
-        <option value="" disabled selected>Select your name...</option>
-        <option>Nimal</option>
-        <option>Sara</option>
-        <option>John</option>
-        <option>Priya</option>
-      </select>
+      <input id="memberInput" type="text" placeholder="Enter your name..." />
       <input id="ideaInput" type="text" placeholder="Enter your idea here..." />
       <div class="button-row">
         <button id="addBtn">Add Idea</button>
@@ -172,7 +189,7 @@
   </div>
 
   <script>
-    const memberSelect = document.getElementById('memberSelect');
+    const memberInput = document.getElementById('memberInput');
     const ideaInput = document.getElementById('ideaInput');
     const addBtn     = document.getElementById('addBtn');
     const clearBtn   = document.getElementById('clearBtn');
@@ -187,11 +204,11 @@
     }
 
     addBtn.addEventListener('click', () => {
-      const name = memberSelect.value;
+      const name = memberInput.value.trim();
       const idea = ideaInput.value.trim();
 
       if (!name) {
-        alert('Please select your name.');
+        alert('Please enter your name.');
         return;
       }
       if (!idea) {
@@ -200,17 +217,24 @@
       }
 
       const li = document.createElement('li');
-      li.textContent = `${idea} – suggested by ${name}`;
+      li.innerHTML = `<span class="idea-text">${idea} – suggested by ${name}</span><button class="delete-btn">Delete</button>`;
+      
+      const deleteBtn = li.querySelector('.delete-btn');
+      deleteBtn.addEventListener('click', () => {
+        li.remove();
+        updateCount();
+      });
+
       ideaList.appendChild(li);
 
       ideaInput.value = '';
-      memberSelect.selectedIndex = 0;
+      memberInput.value = '';
       updateCount();
     });
 
     clearBtn.addEventListener('click', () => {
       ideaInput.value = '';
-      memberSelect.selectedIndex = 0;
+      memberInput.value = '';
     });
 
     // initialize count on page load
