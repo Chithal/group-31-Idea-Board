@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Idea Board</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="card">
+        <header>
+            <h1>Group Idea Board</h1>
+        </header>
+        <main>
+            <div class="input-group">
+                <select id="name-select">
+                    <option value="" disabled selected>Select your name...</option>
+                    <option value="Nimal">Nimal</option>
+                    <option value="Sara">Sara</option>
+                    <option value="Alex">Alex</option>
+                </select>
+                <input type="text" id="idea-input" placeholder="Enter your idea here...">
+                <button id="add-idea-btn">Add Idea</button>
+            </div>
+            <ul id="idea-list">
+                <!-- Ideas will be added here -->
+            </ul>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
