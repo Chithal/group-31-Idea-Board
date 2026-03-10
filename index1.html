@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCSC Student Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="UCSC_logo.png" alt="UCSC Logo" id="ucsc-logo">
+            <span>UCSC</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#gpa-calculator">GPA Calculator</a></li>
+            <li><a href="#study-timer">Study Timer</a></li>
+        </ul>
+        <div class="dark-mode-container">
+            <label class="switch">
+                <input type="checkbox" id="dark-mode-toggle">
+                <span class="slider round"></span>
+            </label>
+            <span>Dark Mode</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Upcoming Events</h2>
+            <ul class="events-list">
+                <li class="event-item">Midterm Exam - March 15</li>
+                <li class="event-item">Project Due - March 20</li>
+                <li class="event-item">Spring Break - March 24</li>
+                <li class="event-item">Final Presentation - April 5</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <section id="gpa-calculator" class="fade-in">
+                <h1>GPA Calculator</h1>
+                <div class="gpa-inputs" id="gpa-inputs-container">
+                    <div class="course-row">
+                        <input type="text" placeholder="Course Name" class="course-name">
+                        <input type="number" placeholder="Credits" class="course-credits" min="0">
+                        <select class="course-grade">
+                            <option value="4.0">A</option>
+                            <option value="3.7">A-</option>
+                            <option value="3.3">B+</option>
+                            <option value="3.0">B</option>
+                            <option value="2.7">B-</option>
+                            <option value="2.3">C+</option>
+                            <option value="2.0">C</option>
+                            <option value="1.7">C-</option>
+                            <option value="1.3">D+</option>
+                            <option value="1.0">D</option>
+                            <option value="0.0">F</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="add-course-btn">Add Course</button>
+                <button id="calculate-gpa-btn">Calculate GPA</button>
+                <div id="gpa-result"></div>
+            </section>
+
+            <section id="study-timer" class="fade-in">
+                <h1>Study Timer</h1>
+                <div class="timer-display" id="timer-display">25:00</div>
+                <div class="timer-controls">
+                    <button id="start-timer-btn">Start</button>
+                    <button id="reset-timer-btn">Reset</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
