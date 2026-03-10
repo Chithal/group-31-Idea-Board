@@ -3,27 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Idea Board</title>
+    <title>Idea Board - Student Hub</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="card">
-        <header>
-            <h1>Group Idea Board</h1>
-            <button id="theme-toggle">Toggle Dark Mode</button>
-        </header>
-        <main>
-            <div class="input-group">
-                <input type="text" id="name-input" placeholder="Enter your name...">
-                <input type="text" id="idea-input" placeholder="Enter your idea here...">
-                <button id="add-idea-btn" disabled>Add Idea</button>
-            </div>
-            <div id="idea-counter">Total Ideas: 0</div>
-            <ul id="idea-list">
-                <!-- Ideas will be added here -->
+    <header class="navbar">
+        <div class="logo">IdeaBoard</div>
+        <nav>
+            <ul>
+                <li><a href="#" id="gpa-link" class="active">GPA Calculator</a></li>
+                <li><a href="#" id="timer-link">Study Timer</a></li>
             </ul>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <h2>Upcoming Events</h2>
+            <ul class="event-list">
+                <li>
+                    <span class="event-date">Mar 12</span>
+                    <span class="event-name">Math Midterm</span>
+                </li>
+                <li>
+                    <span class="event-date">Mar 15</span>
+                    <span class="event-name">Project Proposal Due</span>
+                </li>
+                <li>
+                    <span class="event-date">Mar 20</span>
+                    <span class="event-name">Spring Workshop</span>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <section id="gpa-section" class="view">
+                <h1>GPA Calculator</h1>
+                <p>Track your academic progress with ease.</p>
+                <div class="card">
+                    <p>Enter your grades below to calculate your current GPA.</p>
+                    <!-- Calculator UI would go here -->
+                    <button class="btn-primary">Add Course</button>
+                </div>
+            </section>
+
+            <section id="timer-section" class="view hidden">
+                <h1>Study Timer</h1>
+                <p>Stay focused with the Pomodoro technique.</p>
+                <div class="card">
+                    <div class="timer-display">25:00</div>
+                    <div class="timer-controls">
+                        <button class="btn-primary">Start</button>
+                        <button class="btn-secondary">Reset</button>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
