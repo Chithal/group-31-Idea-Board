@@ -3,69 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Toolkit Dashboard - UCSC Inspired</title>
+    <title>Group Idea Board</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="light-mode">
-    <div class="fade-in-wrapper">
-        <nav class="navbar">
-            <div class="nav-brand">
-                <img src="UCSC_logo.png" alt="UCSC Logo" id="logo">
-                <span>Student Toolkit</span>
+<body>
+    <div class="card">
+        <header>
+            <h1>Group Idea Board</h1>
+            <button id="theme-toggle">Toggle Dark Mode</button>
+        </header>
+        <main>
+            <div class="input-group">
+                <input type="text" id="name-input" placeholder="Enter your name...">
+                <input type="text" id="idea-input" placeholder="Enter your idea here...">
+                <button id="add-idea-btn" disabled>Add Idea</button>
             </div>
-            <ul class="nav-links">
-                <li><a href="#gpa-calc">GPA Calculator</a></li>
-                <li><a href="#study-timer">Study Timer</a></li>
+            <div id="idea-counter">Total Ideas: 0</div>
+            <ul id="idea-list">
+                <!-- Ideas will be added here -->
             </ul>
-            <div class="theme-toggle">
-                <label class="switch">
-                    <input type="checkbox" id="dark-mode-switch">
-                    <span class="slider round"></span>
-                </label>
-                <span id="theme-label">Dark Mode</span>
-            </div>
-        </nav>
-
-        <div class="dashboard-container">
-            <aside class="sidebar">
-                <h3>Upcoming Events</h3>
-                <ul class="events-list">
-                    <li>Midterm: CMPS 101 - Mar 15</li>
-                    <li>Project Due: CSE 120 - Mar 20</li>
-                    <li>Finals Week - Jun 8-12</li>
-                    <li>Spring Break - Mar 21-29</li>
-                </ul>
-            </aside>
-
-            <main class="main-content">
-                <section id="gpa-calc" class="tool-card">
-                    <h2>GPA Calculator</h2>
-                    <div id="course-list">
-                        <div class="course-row">
-                            <input type="text" placeholder="Course Name" class="course-name">
-                            <input type="number" placeholder="Credits" class="course-credits" min="1" step="0.5">
-                            <input type="number" placeholder="Grade (0.0-4.0)" class="course-grade" min="0" max="4" step="0.1">
-                        </div>
-                    </div>
-                    <button id="add-course-btn" class="primary-btn">Add Another Course</button>
-                    <button id="calculate-gpa-btn" class="accent-btn">Calculate GPA</button>
-                    <div id="gpa-result" class="result-display">
-                        Your GPA: <span id="gpa-score">0.00</span>
-                    </div>
-                </section>
-
-                <section id="study-timer" class="tool-card">
-                    <h2>Pomodoro Timer</h2>
-                    <div class="timer-display">
-                        <span id="timer-minutes">25</span>:<span id="timer-seconds">00</span>
-                    </div>
-                    <div class="timer-controls">
-                        <button id="timer-start" class="primary-btn">Start</button>
-                        <button id="timer-reset" class="accent-btn">Reset</button>
-                    </div>
-                </section>
-            </main>
-        </div>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>

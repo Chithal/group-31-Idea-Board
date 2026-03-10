@@ -1,122 +1,92 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Theme Toggle Logic ---
-    const themeSwitch = document.getElementById('dark-mode-switch');
-    const body = document.body;
+// simple avatar lookup; can be extended to URLs or real images
+const avatars = {
+    Nimal: 'https://i.pravatar.cc/24?img=1',
+    Sara: 'https://i.pravatar.cc/24?img=2',
+    Alex: 'https://i.pravatar.cc/24?img=3'
+};
 
-    themeSwitch.addEventListener('change', () => {
-        if (themeSwitch.checked) {
-            body.classList.remove('light-mode');
-            body.classList.add('dark-mode');
-        } else {
-            body.classList.remove('dark-mode');
-            body.classList.add('light-mode');
-        }
-    });
+function getInitials(name) {
+    return name
+        .trim()
+        .split(' ')
+        .map(n => n.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+}
 
-    // --- GPA Calculator Logic ---
-    const courseList = document.getElementById('course-list');
-    const addCourseBtn = document.getElementById('add-course-btn');
-    const calculateGpaBtn = document.getElementById('calculate-gpa-btn');
-    const gpaScoreDisplay = document.getElementById('gpa-score');
+function updateIdeaCount() {
+    const counter = document.getElementById('idea-counter');
+    const ideaList = document.getElementById('idea-list');
+    const count = ideaList.children.length;
+    counter.textContent = `Total Ideas: ${count}`;
+}
 
-    addCourseBtn.addEventListener('click', () => {
-        const newRow = document.createElement('div');
-        newRow.className = 'course-row';
-        newRow.innerHTML = `
-            <input type="text" placeholder="Course Name" class="course-name">
-            <input type="number" placeholder="Credits" class="course-credits" min="1" step="0.5">
-            <input type="number" placeholder="Grade (0.0-4.0)" class="course-grade" min="0" max="4" step="0.1">
-        `;
-        courseList.appendChild(newRow);
-    });
+const nameInput = document.getElementById('name-input');
+const ideaInput = document.getElementById('idea-input');
+const addIdeaBtn = document.getElementById('add-idea-btn');
+const themeToggle = document.getElementById('theme-toggle');
 
-    calculateGpaBtn.addEventListener('click', () => {
-        const rows = document.querySelectorAll('.course-row');
-        let totalPoints = 0;
-        let totalCredits = 0;
+function validateInputs() {
+    const name = nameInput.value.trim();
+    const idea = ideaInput.value.trim();
+    addIdeaBtn.disabled = !name || !idea;
+}
 
-        rows.forEach(row => {
-            const credits = parseFloat(row.querySelector('.course-credits').value);
-            const grade = parseFloat(row.querySelector('.course-grade').value);
+nameInput.addEventListener('input', validateInputs);
+ideaInput.addEventListener('input', validateInputs);
 
-            if (!isNaN(credits) && !isNaN(grade)) {
-                totalPoints += grade * credits;
-                totalCredits += credits;
-            }
-        });
+addIdeaBtn.addEventListener('click', function() {
+    const name = nameInput.value.trim();
+    const idea = ideaInput.value.trim();
+    const ideaList = document.getElementById('idea-list');
 
-        if (totalCredits > 0) {
-            const gpa = totalPoints / totalCredits;
-            gpaScoreDisplay.textContent = gpa.toFixed(2);
-        } else {
-            gpaScoreDisplay.textContent = '0.00';
-            alert('Please enter valid credits and grades.');
-        }
-    });
+    const listItem = document.createElement('li');
 
-    // --- Pomodoro Timer Logic ---
-    let timerInterval;
-    let timeLeft = 1500; // 25 minutes in seconds
-    let isRunning = false;
+    // create a highlighted idea text element
+    const ideaSpan = document.createElement('span');
+    ideaSpan.classList.add('idea-text');
+    ideaSpan.textContent = `"${idea}"`;
 
-    const minutesDisplay = document.getElementById('timer-minutes');
-    const secondsDisplay = document.getElementById('timer-seconds');
-    const startBtn = document.getElementById('timer-start');
-    const resetBtn = document.getElementById('timer-reset');
-
-    function updateTimerDisplay() {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        minutesDisplay.textContent = minutes.toString().padStart(2, '0');
-        secondsDisplay.textContent = seconds.toString().padStart(2, '0');
+    // create an avatar element (image or initials)
+    const avatarSpan = document.createElement('span');
+    avatarSpan.classList.add('avatar');
+    if (avatars[name]) {
+        avatarSpan.style.backgroundImage = `url(${avatars[name]})`;
+    } else {
+        avatarSpan.textContent = getInitials(name);
+        // Generate a random background color for new names
+        const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#ffc107', '#ff9800', '#ff5722'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        avatarSpan.style.backgroundColor = randomColor;
     }
 
-    function startTimer() {
-        if (isRunning) {
-            clearInterval(timerInterval);
-            startBtn.textContent = 'Start';
-            isRunning = false;
-        } else {
-            isRunning = true;
-            startBtn.textContent = 'Pause';
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
+    const authorSpan = document.createElement('span');
+    authorSpan.classList.add('author');
+    authorSpan.appendChild(avatarSpan);
 
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    isRunning = false;
-                    startBtn.textContent = 'Start';
-                    timeLeft = 1500;
-                    alert('Time is up! Take a break.');
-                    updateTimerDisplay();
-                }
-            }, 1000);
-        }
-    }
+    const nameElem = document.createElement('em');
+    nameElem.textContent = name;
+    authorSpan.appendChild(nameElem);
 
-    function resetTimer() {
-        clearInterval(timerInterval);
-        isRunning = false;
-        timeLeft = 1500;
-        startBtn.textContent = 'Start';
-        updateTimerDisplay();
-    }
+    listItem.appendChild(ideaSpan);
+    listItem.appendChild(authorSpan);
 
-    startBtn.addEventListener('click', startTimer);
-    resetBtn.addEventListener('click', resetTimer);
+    ideaList.appendChild(listItem);
 
-    // Initial display
-    updateTimerDisplay();
+    // Clear inputs and re-disable button
+    ideaInput.value = '';
+    validateInputs();
 
-    // --- Smooth Scrolling for Navbar Links ---
-    document.querySelectorAll('.nav-links a').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href').substring(1);
-            document.getElementById(targetId).scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
-    });
+    // update counter
+    updateIdeaCount();
 });
+
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    themeToggle.textContent = isDark ? 'Switch to Light' : 'Switch to Dark';
+});
+
+// initialize counter on load
+window.addEventListener('DOMContentLoaded', updateIdeaCount);
