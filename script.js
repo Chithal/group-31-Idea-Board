@@ -1,92 +1,175 @@
-// simple avatar lookup; can be extended to URLs or real images
-const avatars = {
-    Nimal: 'https://i.pravatar.cc/24?img=1',
-    Sara: 'https://i.pravatar.cc/24?img=2',
-    Alex: 'https://i.pravatar.cc/24?img=3'
-};
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Navigation Logic ---
+    const links = {
+        gpa: document.getElementById('gpa-link'),
+        timer: document.getElementById('timer-link'),
+        idea: document.getElementById('idea-link')
+    };
+    const sections = {
+        gpa: document.getElementById('gpa-section'),
+        timer: document.getElementById('timer-section'),
+        idea: document.getElementById('idea-section')
+    };
 
-function getInitials(name) {
-    return name
-        .trim()
-        .split(' ')
-        .map(n => n.charAt(0))
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-}
+    function switchView(activeKey) {
+        Object.keys(sections).forEach(key => {
+            sections[key].classList.add('hidden');
+            sections[key].classList.remove('fade-in');
+            links[key].classList.remove('active');
+        });
 
-function updateIdeaCount() {
-    const counter = document.getElementById('idea-counter');
-    const ideaList = document.getElementById('idea-list');
-    const count = ideaList.children.length;
-    counter.textContent = `Total Ideas: ${count}`;
-}
+        const activeSection = sections[activeKey];
+        const activeLink = links[activeKey];
 
-const nameInput = document.getElementById('name-input');
-const ideaInput = document.getElementById('idea-input');
-const addIdeaBtn = document.getElementById('add-idea-btn');
-const themeToggle = document.getElementById('theme-toggle');
-
-function validateInputs() {
-    const name = nameInput.value.trim();
-    const idea = ideaInput.value.trim();
-    addIdeaBtn.disabled = !name || !idea;
-}
-
-nameInput.addEventListener('input', validateInputs);
-ideaInput.addEventListener('input', validateInputs);
-
-addIdeaBtn.addEventListener('click', function() {
-    const name = nameInput.value.trim();
-    const idea = ideaInput.value.trim();
-    const ideaList = document.getElementById('idea-list');
-
-    const listItem = document.createElement('li');
-
-    // create a highlighted idea text element
-    const ideaSpan = document.createElement('span');
-    ideaSpan.classList.add('idea-text');
-    ideaSpan.textContent = `"${idea}"`;
-
-    // create an avatar element (image or initials)
-    const avatarSpan = document.createElement('span');
-    avatarSpan.classList.add('avatar');
-    if (avatars[name]) {
-        avatarSpan.style.backgroundImage = `url(${avatars[name]})`;
-    } else {
-        avatarSpan.textContent = getInitials(name);
-        // Generate a random background color for new names
-        const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#ffc107', '#ff9800', '#ff5722'];
-        const randomColor = colors[Math.floor(Math.random() * colors.length)];
-        avatarSpan.style.backgroundColor = randomColor;
+        activeSection.classList.remove('hidden');
+        void activeSection.offsetWidth; // Trigger reflow for animation
+        activeSection.classList.add('fade-in');
+        activeLink.classList.add('active');
     }
 
-    const authorSpan = document.createElement('span');
-    authorSpan.classList.add('author');
-    authorSpan.appendChild(avatarSpan);
+    Object.keys(links).forEach(key => {
+        links[key].addEventListener('click', (e) => {
+            e.preventDefault();
+            switchView(key);
+        });
+    });
 
-    const nameElem = document.createElement('em');
-    nameElem.textContent = name;
-    authorSpan.appendChild(nameElem);
+    // --- Dark Mode ---
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    darkModeToggle.addEventListener('change', () => {
+        if (darkModeToggle.checked) {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+    });
 
-    listItem.appendChild(ideaSpan);
-    listItem.appendChild(authorSpan);
+    // --- GPA Calculator ---
+    const gpaBody = document.getElementById('gpa-body');
+    const addCourseBtn = document.getElementById('add-course');
+    const calculateGpaBtn = document.getElementById('calculate-gpa');
+    const gpaValueDisplay = document.getElementById('gpa-value');
 
-    ideaList.appendChild(listItem);
+    addCourseBtn.addEventListener('click', () => {
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" placeholder="e.g. Course" class="course-input"></td>
+            <td><input type="number" placeholder="3" class="credit-input" min="0"></td>
+            <td>
+                <select class="grade-input">
+                    <option value="4.0">A</option>
+                    <option value="3.0">B</option>
+                    <option value="2.0">C</option>
+                    <option value="1.0">D</option>
+                    <option value="0.0">F</option>
+                </select>
+            </td>
+            <td><button class="remove-btn" style="background:none; border:none; cursor:pointer; color:red; font-size:1.2rem;">&times;</button></td>
+        `;
+        gpaBody.appendChild(newRow);
+        newRow.querySelector('.remove-btn').addEventListener('click', () => newRow.remove());
+    });
 
-    // Clear inputs and re-disable button
-    ideaInput.value = '';
-    validateInputs();
+    calculateGpaBtn.addEventListener('click', () => {
+        const credits = document.querySelectorAll('.credit-input');
+        const grades = document.querySelectorAll('.grade-input');
+        let totalPoints = 0, totalCredits = 0;
+        credits.forEach((input, i) => {
+            const val = parseFloat(input.value);
+            if (!isNaN(val) && val > 0) {
+                totalPoints += val * parseFloat(grades[i].value);
+                totalCredits += val;
+            }
+        });
+        gpaValueDisplay.textContent = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+    });
 
-    // update counter
-    updateIdeaCount();
+    // --- Pomodoro Timer ---
+    let timerInterval, timeLeft = 25 * 60;
+    const timerDisplay = document.getElementById('timer-display');
+    const startBtn = document.getElementById('timer-start');
+    const resetBtn = document.getElementById('timer-reset');
+
+    function updateTimer() {
+        const mins = Math.floor(timeLeft / 60), secs = timeLeft % 60;
+        timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    startBtn.addEventListener('click', () => {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            startBtn.textContent = "Start";
+        } else {
+            startBtn.textContent = "Pause";
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    startBtn.textContent = "Start";
+                    alert("Time's up! Take a break.");
+                }
+            }, 1000);
+        }
+    });
+
+    resetBtn.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timeLeft = 25 * 60;
+        updateTimer();
+        startBtn.textContent = "Start";
+    });
+
+    // --- Idea Board ---
+    const ideaGrid = document.getElementById('idea-grid');
+    const addIdeaBtn = document.getElementById('add-idea-btn');
+
+    function createIdeaCard(content = "") {
+        const card = document.createElement('div');
+        card.className = 'idea-card';
+        card.innerHTML = `
+            <button class="delete-idea" title="Delete">&times;</button>
+            <textarea class="idea-content" placeholder="Type your idea...">${content}</textarea>
+            <button class="save-idea" title="Save Idea">✓</button>
+        `;
+
+        const textarea = card.querySelector('.idea-content');
+        const saveBtn = card.querySelector('.save-idea');
+
+        textarea.addEventListener('input', saveIdeas);
+        
+        card.querySelector('.delete-idea').addEventListener('click', () => {
+            card.remove();
+            saveIdeas();
+        });
+
+        saveBtn.addEventListener('click', () => {
+            saveIdeas();
+            saveBtn.classList.add('saved');
+            setTimeout(() => saveBtn.classList.remove('saved'), 1000);
+        });
+
+        ideaGrid.appendChild(card);
+    }
+
+    function saveIdeas() {
+        const ideas = Array.from(document.querySelectorAll('.idea-content')).map(ta => ta.value);
+        localStorage.setItem('student_toolkit_ideas', JSON.stringify(ideas));
+    }
+
+    function loadIdeas() {
+        const ideas = JSON.parse(localStorage.getItem('student_toolkit_ideas') || "[]");
+        if (ideas.length === 0) createIdeaCard();
+        else ideas.forEach(text => createIdeaCard(text));
+    }
+
+    addIdeaBtn.addEventListener('click', () => {
+        createIdeaCard();
+        saveIdeas();
+    });
+
+    loadIdeas();
 });
-
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    themeToggle.textContent = isDark ? 'Switch to Light' : 'Switch to Dark';
-});
-
-// initialize counter on load
-window.addEventListener('DOMContentLoaded', updateIdeaCount);
