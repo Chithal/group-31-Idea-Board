@@ -50,6 +50,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const calculateGpaBtn = document.getElementById('calculate-gpa');
     const gpaValueDisplay = document.getElementById('gpa-value');
 
+    function calculateGPA() {
+        const rows = gpaBody.querySelectorAll('tr');
+        let totalPoints = 0;
+        let totalCredits = 0;
+        const courseNames = [];
+        let hasDuplicates = false;
+
+        rows.forEach(row => {
+            const nameInput = row.querySelector('.course-input');
+            const creditInput = row.querySelector('.credit-input');
+            const gradeSelect = row.querySelector('.grade-input');
+
+            if (!nameInput || !creditInput || !gradeSelect) return;
+
+            const name = nameInput.value.trim().toLowerCase();
+            if (name !== "") {
+                if (courseNames.includes(name)) {
+                    hasDuplicates = true;
+                }
+                courseNames.push(name);
+            }
+
+            const credits = parseFloat(creditInput.value);
+            const grade = parseFloat(gradeSelect.value);
+
+            if (!isNaN(credits) && credits > 0) {
+                totalPoints += credits * grade;
+                totalCredits += credits;
+            }
+        });
+
+        if (hasDuplicates) {
+            // We don't alert here to avoid annoying the user while they type
+            // But we can mark the inputs or just calculate anyway.
+            // For now, let's just calculate but we'll check it on the explicit button click.
+        }
+
+        gpaValueDisplay.textContent = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+    }
+
     addCourseBtn.addEventListener('click', () => {
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
@@ -67,42 +107,45 @@ document.addEventListener('DOMContentLoaded', () => {
             <td><button class="remove-btn" style="background:none; border:none; cursor:pointer; color:red; font-size:1.2rem;">&times;</button></td>
         `;
         gpaBody.appendChild(newRow);
-        newRow.querySelector('.remove-btn').addEventListener('click', () => newRow.remove());
+        
+        // Add listeners for automatic calculation
+        newRow.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', calculateGPA);
+        });
+
+        newRow.querySelector('.remove-btn').addEventListener('click', () => {
+            newRow.remove();
+            calculateGPA();
+        });
+    });
+
+    // Initial row listeners
+    gpaBody.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', calculateGPA);
     });
 
     calculateGpaBtn.addEventListener('click', () => {
-        const courseInputs = document.querySelectorAll('.course-input');
-        const credits = document.querySelectorAll('.credit-input');
-        const grades = document.querySelectorAll('.grade-input');
-        
-        // Check for duplicate course names
+        const rows = gpaBody.querySelectorAll('tr');
         const courseNames = [];
         let hasDuplicates = false;
-        
-        for (let input of courseInputs) {
-            const name = input.value.trim().toLowerCase();
-            if (name === "") continue;
-            if (courseNames.includes(name)) {
-                hasDuplicates = true;
-                break;
+
+        rows.forEach(row => {
+            const nameInput = row.querySelector('.course-input');
+            if (nameInput) {
+                const name = nameInput.value.trim().toLowerCase();
+                if (name !== "") {
+                    if (courseNames.includes(name)) hasDuplicates = true;
+                    courseNames.push(name);
+                }
             }
-            courseNames.push(name);
-        }
+        });
 
         if (hasDuplicates) {
             alert("Duplicate courses detected. Please ensure each course has a unique name.");
             return;
         }
 
-        let totalPoints = 0, totalCredits = 0;
-        credits.forEach((input, i) => {
-            const val = parseFloat(input.value);
-            if (!isNaN(val) && val > 0) {
-                totalPoints += val * parseFloat(grades[i].value);
-                totalCredits += val;
-            }
-        });
-        gpaValueDisplay.textContent = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+        calculateGPA();
     });
 
     // --- Pomodoro Timer ---
@@ -148,19 +191,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const ideaGrid = document.getElementById('idea-grid');
     const addIdeaBtn = document.getElementById('add-idea-btn');
 
-    function createIdeaCard(content = "") {
+    function countWords(str) {
+        return str.trim().split(/\s+/).filter(word => word.length > 0).length;
+    }
+
+    function isValidSubject(subject) {
+        // Cannot start with spaces
+        if (subject.startsWith(' ')) return false;
+        // Cannot contain special characters (only alphanumeric and spaces allowed)
+        const specialChars = /[^a-zA-Z0-9 ]/g;
+        return !specialChars.test(subject);
+    }
+
+    function createIdeaCard(subject = "", content = "") {
         const card = document.createElement('div');
         card.className = 'idea-card';
         card.innerHTML = `
             <button class="delete-idea" title="Delete">&times;</button>
+            <input type="text" class="idea-subject" placeholder="Subject" value="${subject}">
             <textarea class="idea-content" placeholder="Type your idea...">${content}</textarea>
+            <div class="word-count">0/250 words</div>
             <button class="save-idea" title="Save Idea">✓</button>
         `;
 
+        const subjectInput = card.querySelector('.idea-subject');
         const textarea = card.querySelector('.idea-content');
         const saveBtn = card.querySelector('.save-idea');
+        const wordCountDisplay = card.querySelector('.word-count');
+
+        function updateWordCount() {
+            const count = countWords(textarea.value);
+            wordCountDisplay.textContent = `${count}/250 words`;
+            if (count > 250) {
+                wordCountDisplay.style.color = 'red';
+            } else {
+                wordCountDisplay.style.color = 'inherit';
+            }
+        }
+
+        updateWordCount();
 
         textarea.addEventListener('input', () => {
+            updateWordCount();
+            saveIdeas();
+        });
+
+        subjectInput.addEventListener('input', () => {
+            if (subjectInput.value !== "" && !isValidSubject(subjectInput.value)) {
+                subjectInput.classList.add('invalid');
+            } else {
+                subjectInput.classList.remove('invalid');
+            }
             saveIdeas();
         });
         
@@ -170,11 +251,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         saveBtn.addEventListener('click', () => {
-            if (textarea.value.trim() === "") {
-                alert("Please enter some text before saving.");
+            const currentSubject = subjectInput.value;
+            const currentContent = textarea.value;
+
+            if (currentSubject.trim() === "" && currentContent.trim() === "") {
+                alert("Please enter a subject or some text before saving.");
+                return;
+            }
+
+            if (!isValidSubject(currentSubject)) {
+                alert("Subject name cannot start with spaces and cannot contain special characters.");
+                subjectInput.focus();
+                return;
+            }
+
+            if (countWords(currentContent) > 250) {
+                alert("Idea content exceeds the 250-word limit.");
                 textarea.focus();
                 return;
             }
+
             saveIdeas();
             saveBtn.classList.add('saved');
             setTimeout(() => saveBtn.classList.remove('saved'), 1000);
@@ -184,24 +280,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveIdeas() {
-        const ideas = Array.from(document.querySelectorAll('.idea-content'))
-            .map(ta => ta.value.trim())
-            .filter(val => val !== "");
-        localStorage.setItem('student_toolkit_ideas', JSON.stringify(ideas));
+        const cards = Array.from(document.querySelectorAll('.idea-card'));
+        const ideas = cards.map(card => {
+            const subject = card.querySelector('.idea-subject').value;
+            const content = card.querySelector('.idea-content').value;
+            return { subject, content };
+        }).filter(idea => idea.subject.trim() !== "" || idea.content.trim() !== "");
+        
+        localStorage.setItem('student_toolkit_ideas_v2', JSON.stringify(ideas));
     }
 
     function loadIdeas() {
-        const ideas = JSON.parse(localStorage.getItem('student_toolkit_ideas') || "[]");
+        // Try loading v2 format first
+        let ideas = JSON.parse(localStorage.getItem('student_toolkit_ideas_v2') || "null");
+        
+        if (!ideas) {
+            // Fallback to v1 format if v2 doesn't exist
+            const oldIdeas = JSON.parse(localStorage.getItem('student_toolkit_ideas') || "[]");
+            ideas = oldIdeas.map(text => ({ subject: "", content: text }));
+        }
+
         if (ideas.length === 0) createIdeaCard();
-        else ideas.forEach(text => createIdeaCard(text));
+        else ideas.forEach(idea => createIdeaCard(idea.subject, idea.content));
     }
 
     addIdeaBtn.addEventListener('click', () => {
-        const textareas = document.querySelectorAll('.idea-content');
-        if (textareas.length > 0) {
-            const lastTextarea = textareas[textareas.length - 1];
-            if (lastTextarea.value.trim() === "") {
-                lastTextarea.focus();
+        const cards = document.querySelectorAll('.idea-card');
+        if (cards.length > 0) {
+            const lastCard = cards[cards.length - 1];
+            const lastSubject = lastCard.querySelector('.idea-subject').value.trim();
+            const lastContent = lastCard.querySelector('.idea-content').value.trim();
+            if (lastSubject === "" && lastContent === "") {
+                lastCard.querySelector('.idea-subject').focus();
                 return;
             }
         }

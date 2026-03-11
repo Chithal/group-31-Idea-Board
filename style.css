@@ -273,6 +273,34 @@ input, select {
     color: inherit;
     resize: none;
     outline: none;
+    margin-top: 0.5rem;
+}
+
+.idea-subject {
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    outline: none;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(128, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+    transition: border-bottom-color 0.3s, color 0.3s;
+}
+
+.idea-subject.invalid {
+    border-bottom-color: #ff4d4f !important;
+    color: #ff4d4f !important;
+}
+
+.word-count {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.5rem;
+    text-align: right;
+    padding-right: 2rem;
 }
 
 .delete-idea {
