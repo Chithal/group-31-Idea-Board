@@ -71,8 +71,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     calculateGpaBtn.addEventListener('click', () => {
+        const courseInputs = document.querySelectorAll('.course-input');
         const credits = document.querySelectorAll('.credit-input');
         const grades = document.querySelectorAll('.grade-input');
+        
+        // Check for duplicate course names
+        const courseNames = [];
+        let hasDuplicates = false;
+        
+        for (let input of courseInputs) {
+            const name = input.value.trim().toLowerCase();
+            if (name === "") continue;
+            if (courseNames.includes(name)) {
+                hasDuplicates = true;
+                break;
+            }
+            courseNames.push(name);
+        }
+
+        if (hasDuplicates) {
+            alert("Duplicate courses detected. Please ensure each course has a unique name.");
+            return;
+        }
+
         let totalPoints = 0, totalCredits = 0;
         credits.forEach((input, i) => {
             const val = parseFloat(input.value);
@@ -139,7 +160,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const textarea = card.querySelector('.idea-content');
         const saveBtn = card.querySelector('.save-idea');
 
-        textarea.addEventListener('input', saveIdeas);
+        textarea.addEventListener('input', () => {
+            saveIdeas();
+        });
         
         card.querySelector('.delete-idea').addEventListener('click', () => {
             card.remove();
@@ -147,6 +170,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         saveBtn.addEventListener('click', () => {
+            if (textarea.value.trim() === "") {
+                alert("Please enter some text before saving.");
+                textarea.focus();
+                return;
+            }
             saveIdeas();
             saveBtn.classList.add('saved');
             setTimeout(() => saveBtn.classList.remove('saved'), 1000);
@@ -156,7 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveIdeas() {
-        const ideas = Array.from(document.querySelectorAll('.idea-content')).map(ta => ta.value);
+        const ideas = Array.from(document.querySelectorAll('.idea-content'))
+            .map(ta => ta.value.trim())
+            .filter(val => val !== "");
         localStorage.setItem('student_toolkit_ideas', JSON.stringify(ideas));
     }
 
@@ -167,8 +197,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     addIdeaBtn.addEventListener('click', () => {
+        const textareas = document.querySelectorAll('.idea-content');
+        if (textareas.length > 0) {
+            const lastTextarea = textareas[textareas.length - 1];
+            if (lastTextarea.value.trim() === "") {
+                lastTextarea.focus();
+                return;
+            }
+        }
         createIdeaCard();
-        saveIdeas();
     });
 
     loadIdeas();
